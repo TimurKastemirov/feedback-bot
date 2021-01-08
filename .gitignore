@@ -1,0 +1,4 @@
+node_modules
+.idea
+./bot-token.ts
+./bot-token.js
