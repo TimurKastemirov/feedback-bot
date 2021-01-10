@@ -1,17 +1,19 @@
+const fs = require('fs');
 const { Telegraf } = require('telegraf');
 const { botToken } = require('./bot-token');
+const { messages: { helloMessage, thanksMessage } } = require('./messages');
+const { subscriberChatIds: savedSubscriberChatIds } = require('./subscriber-chat-ids');
 
 if (botToken === undefined) {
     throw new Error('BOT_TOKEN must be provided!')
 }
 
 (function (bot) {
-    let subscriberChatIds = [];
+    let subscriberChatIds = savedSubscriberChatIds.slice(0);
 
     bot.start(
         (ctx) => {
-            const text = `Здравствуйте,вас приветствует бот отзывов.\nВы можете оставить анонимный отзыв об Исмаиловой Эрисмаль Мусаевне как о человеке и специалисте`;
-            return ctx.reply(text);
+            return ctx.reply(helloMessage);
         }
     ); //ответ бота на команду /start
 
@@ -24,12 +26,20 @@ if (botToken === undefined) {
         if (subscriberChatIds.indexOf(chatId) === -1) {
             subscriberChatIds.push(chatId);
         }
+
+        const textToWrite = `exports.subscriberChatIds = [\n\t${subscriberChatIds.join(",\n\t")}\n];`
+        fs.writeFile('./subscriber-chat-ids.js', textToWrite, () => {});
+
         return ctx.reply('вы подписаны на получение анонимных отзывов');
     });
 
     bot.command('unsubscribe', (ctx) => {
         const chatId = ctx.update.message.chat.id;
         subscriberChatIds = subscriberChatIds.filter(id => id !== chatId);
+
+        const textToWrite = `exports.subscriberChatIds = [\n\t${subscriberChatIds.join(",\n\t")}\n];`
+        fs.writeFile('./subscriber-chat-ids.js', textToWrite, () => {});
+
         return ctx.reply('вы отписаны от получения анонимных отзывов');
     });
 
@@ -40,6 +50,8 @@ if (botToken === undefined) {
                 bot.telegram.sendMessage(chatId, messageText);
             });
         }
+
+        return ctx.reply(thanksMessage);
     });
 
     bot.launch(); // запуск бота
