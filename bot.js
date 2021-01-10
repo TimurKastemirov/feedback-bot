@@ -45,6 +45,11 @@ if (botToken === undefined) {
 
     bot.on('text', ctx => {
         const messageText = ctx.update.message.text;
+        const regex = /^\/.*/;
+        if (regex.test(messageText)) {
+            return ctx.reply(`Нет такой команды => ${messageText}`);
+        }
+
         if (subscriberChatIds.length > 0) {
             subscriberChatIds.forEach(chatId => {
                 bot.telegram.sendMessage(chatId, messageText);
