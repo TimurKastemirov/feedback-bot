@@ -1,3 +1,1 @@
-exports.subscriberChatIds = [
-	237938574
-];
+exports.subscriberChatIds = [];
