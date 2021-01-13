@@ -28,9 +28,21 @@ if (botToken === undefined) {
         }
 
         const textToWrite = `exports.subscriberChatIds = [\n\t${subscriberChatIds.join(",\n\t")}\n];`
-        fs.writeFile('./subscriber-chat-ids.js', textToWrite, () => {});
+        fs.writeFile('./subscriber-chat-ids.js', textToWrite, (err) => {
+            if (err) {
+                return console.log(JSON.stringify(err));
+            }
+
+            console.log(textToWrite);
+        });
 
         return ctx.reply('вы подписаны на получение анонимных отзывов');
+    });
+
+    bot.command('subscribe_status', (ctx) => {
+        let text = `saved subscribers before start bot => ${savedSubscriberChatIds.join(', ')}\n`;
+        text += `subscribed now => ${subscriberChatIds.join(', ')}\n`;
+        return ctx.reply(text);
     });
 
     bot.command('unsubscribe', (ctx) => {
@@ -38,7 +50,13 @@ if (botToken === undefined) {
         subscriberChatIds = subscriberChatIds.filter(id => id !== chatId);
 
         const textToWrite = `exports.subscriberChatIds = [\n\t${subscriberChatIds.join(",\n\t")}\n];`
-        fs.writeFile('./subscriber-chat-ids.js', textToWrite, () => {});
+        fs.writeFile('./subscriber-chat-ids.js', textToWrite, (err) => {
+            if (err) {
+                return console.log(JSON.stringify(err));
+            }
+
+            console.log(textToWrite);
+        });
 
         return ctx.reply('вы отписаны от получения анонимных отзывов');
     });
